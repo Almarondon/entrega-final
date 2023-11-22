@@ -74,18 +74,30 @@ class CarritoCompra {
 
 class Prueba {
     constructor() {
-        this.stockProductos = [
-            new Producto(1, "Resveratrol", 20000, "images/producto-1.png"),
-            new Producto(2, "Age Complex", 25000, "images/producto-2.png"),
-            new Producto(3, "Aox eye gel", 31500, "images/producto-3.png"),
-            new Producto(4, "Blemish Age Cleanser", 22000, "images/producto-4.png"),
-            new Producto(5, "Blemish Age Defense", 35000, "images/producto-5.png"),
-            new Producto(6, "Ferulic", 38000, "images/producto-6.png"),
-            new Producto(7, "Phyto Corrective", 29000, "images/producto-7.png"),
-            new Producto(8, "Epidermal Repair", 32000, "images/producto-8.png"),
-            new Producto(9, "Intensifier", 27000, "images/producto-9.png"),
-            new Producto(10, "Physical Fusion UV Defense", 30000, "images/producto-10.png"),
-        ];
+        this.carritoCompra = new CarritoCompra();
+        this.stockProductos = [];
+        this.persona = new Persona("Anonimo");
+    }
+    async init() {
+        const response = await fetch("./data/productos.JSON");
+        this.stockProductos = await response.json();
+
+        this.crearVisualizacionProductos(this.stockProductos);
+
+        localStorage.setItem("persona", JSON.stringify(this.persona))
+
+        const jsonCarritoCompraStorage = localStorage.getItem("carritoCompra");
+
+        if (jsonCarritoCompraStorage !== null) {
+            const dataStored = JSON.parse(jsonCarritoCompraStorage);
+            this.carritoCompra.persona = dataStored.persona;
+            this.carritoCompra.productosCarritoCompra = dataStored.productosCarritoCompra.map(r => new ProductoCarritoCompra(r.producto, r.cantidad));
+
+            this.updateHtmlCarritoCompra();
+        }
+        else {
+            this.carritoCompra.agregarPersona(this.persona);
+        }
     }
     templateCard(producto) {
         const template = `<div class="card mb-4 card-producto card-fancy">
@@ -149,10 +161,10 @@ class Prueba {
 
         return containerCard;
     }
-    crearVisualizacionProductos() {
+    crearVisualizacionProductos(data) {
         const containerProducts = document.getElementById("container-products");
 
-        for (const stockProducto of this.stockProductos) {
+        for (const stockProducto of data) {
             const cardProduct = this.templateCard(stockProducto);
             containerProducts.append(cardProduct);
         }
@@ -161,8 +173,8 @@ class Prueba {
         return valor1.toLowerCase() === valor2.toLowerCase();
     }
     removerProducto(uuid) {
-        carritoCompra.removerItem(uuid);
-        localStorage.setItem("carritoCompra", JSON.stringify(carritoCompra));
+        this.carritoCompra.removerItem(uuid);
+        localStorage.setItem("carritoCompra", JSON.stringify(this.carritoCompra));
 
         const carritoCompraLista = document.getElementById("carrito-compra-lista");
 
@@ -171,13 +183,13 @@ class Prueba {
         carritoCompraLista.removeChild(nodeItem);
 
         const cantidadProductos = document.getElementById("cantidad-productos")
-        cantidadProductos.innerText = carritoCompra.totalizarItems();
+        cantidadProductos.innerText = this.carritoCompra.totalizarItems();
 
         const botonPagar = document.getElementById("boton-pagar")
-        botonPagar.innerText = `Pagar $ ${carritoCompra.calcularTotal()}`
+        botonPagar.innerText = `Pagar $ ${this.carritoCompra.calcularTotal()}`
     }
     agregarProducto(productoId, e) {
-        const producto = prueba.stockProductos.find(r => r.id === productoId);
+        const producto = this.stockProductos.find(r => r.id === productoId);
 
         const selectCantidadProducto = document.getElementById(`select-cantidad-${productoId}`);
         const cantidadProducto = Number(selectCantidadProducto.value);
@@ -198,8 +210,8 @@ class Prueba {
         }).then((result) => {
             if (result.isConfirmed) {
                 const productoCarritoCompra = new ProductoCarritoCompra(producto, cantidadProducto);
-                carritoCompra.agregarItem(productoCarritoCompra);
-                localStorage.setItem("carritoCompra", JSON.stringify(carritoCompra));
+                this.carritoCompra.agregarItem(productoCarritoCompra);
+                localStorage.setItem("carritoCompra", JSON.stringify(this.carritoCompra));
 
                 this.updateHtmlCarritoCompra();
             }
@@ -208,36 +220,33 @@ class Prueba {
     updateHtmlCarritoCompra() {
         const carritoCompraLista = document.getElementById("carrito-compra-lista");
         carritoCompraLista.innerHTML = ''
-    
-        for (const productoCarritoCompra of carritoCompra.productosCarritoCompra) {
+
+        for (const productoCarritoCompra of this.carritoCompra.productosCarritoCompra) {
             const templateItemCarritoCompra = prueba.templateItemCarritoCompra(productoCarritoCompra);
             carritoCompraLista.append(templateItemCarritoCompra);
         }
 
         const cantidadProductos = document.getElementById("cantidad-productos")
-        cantidadProductos.innerText = carritoCompra.totalizarItems();
+        cantidadProductos.innerText = this.carritoCompra.totalizarItems();
 
         const botonPagar = document.getElementById("boton-pagar")
-        botonPagar.innerText = `Pagar $ ${carritoCompra.calcularTotal()}`
+        botonPagar.innerText = `Pagar $ ${this.carritoCompra.calcularTotal()}`
     }
 }
 
-const prueba = new Prueba();
-prueba.crearVisualizacionProductos();
-const persona = new Persona("Anonimo");
-localStorage.setItem("persona", JSON.stringify(persona))
+let prueba;
 
-const jsonCarritoCompraStorage = localStorage.getItem("carritoCompra");
-
-const carritoCompra = new CarritoCompra();
-
-if (jsonCarritoCompraStorage !== null) {
-    const dataStored = JSON.parse(jsonCarritoCompraStorage);
-    carritoCompra.persona = dataStored.persona;
-    carritoCompra.productosCarritoCompra = dataStored.productosCarritoCompra.map(r => new ProductoCarritoCompra(r.producto, r.cantidad));
-
-    prueba.updateHtmlCarritoCompra();
+const start = async function () {
+    prueba = new Prueba();
+    await prueba.init();
 }
-else {
-    carritoCompra.agregarPersona(persona);
-}
+
+start();
+
+
+
+
+
+
+
+

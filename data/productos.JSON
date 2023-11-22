@@ -1,0 +1,62 @@
+[
+    {
+        "id": 1,
+        "nombre": "Resveratrol",
+        "precio": 20000,
+        "imageSrc": "images/producto-1.png"
+    },
+    {
+        "id": 2,
+        "nombre": "Age Complex",
+        "precio": 25000,
+        "imageSrc": "images/producto-2.png"
+    },
+    {
+        "id": 3,
+        "nombre": "Aox eye gel",
+        "precio": 31500,
+        "imageSrc": "images/producto-3.png"
+    },
+    {
+        "id": 4,
+        "nombre": "Blemish Age Cleanser",
+        "precio": 22000,
+        "imageSrc": "images/producto-4.png"
+    },
+    {
+        "id": 5,
+        "nombre": "Blemish Age Defense",
+        "precio": 35000,
+        "imageSrc": "images/producto-5.png"
+    },
+    {
+        "id": 6,
+        "nombre": "Ferulic",
+        "precio": 38000,
+        "imageSrc": "images/producto-6.png"
+    },
+    {
+        "id": 7,
+        "nombre": "Phyto Corrective",
+        "precio": 29000,
+        "imageSrc": "images/producto-7.png"
+    },
+    {
+        "id": 8,
+        "nombre": "Epidermal Repair",
+        "precio": 32000,
+        "imageSrc": "images/producto-8.png"
+    },
+    {
+        "id": 9,
+        "nombre": "Intensifier",
+        "precio": 27000,
+        "imageSrc": "images/producto-9.png"
+    },
+    {
+        "id": 10,
+        "nombre": "Physical Fusion UV Defense",
+        "precio": 30000,
+        "imageSrc": "images/producto-10.png"
+    }
+]
